@@ -1,0 +1,43 @@
+#%RAML 0.8
+
+title: Example Records API
+baseUri: https://localhost/mod-raml-module-builder-sample
+version: 1.0
+
+documentation:
+  - title: Sample RAML Module Builder Module
+    content: This demonstrates some features of the RAML Module Builder
+
+schemas:
+  - record.json: !include record.json
+  - records: !include records.json
+  - errors: !include raml-util/schemas/errors.schema
+  - error.schema: !include raml-util/schemas/error.schema
+  - parameters.schema: !include raml-util/schemas/parameters.schema
+  - raml-util/schemas/metadata.schema: !include raml-util/schemas/metadata.schema
+
+traits:
+  - validate: !include raml-util/traits/validation.raml
+  - secured: !include raml-util/traits/auth.raml
+  - language: !include raml-util/traits/language.raml
+  - pageable:  !include raml-util/traits/pageable.raml
+  - searchable: !include raml-util/traits/searchable.raml
+
+resourceTypes:
+  - collection: !include raml-util/rtypes/collection.raml
+  - collection-item: !include raml-util/rtypes/item-collection.raml
+
+/records:
+  displayName: Records
+  description: Records collection
+  type:
+    collection:
+      schemaCollection: records
+      schemaItem: record.json
+      exampleCollection: !include examples/records.json
+      exampleItem: !include examples/record.json
+  /{recordId}:
+        type:
+          collection-item:
+            exampleItem: !include examples/record.json
+            schema: record.json
