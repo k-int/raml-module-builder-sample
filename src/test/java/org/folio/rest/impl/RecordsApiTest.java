@@ -1,8 +1,7 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.json.JsonObject;
-import org.folio.rest.RestVerticle;
 import org.folio.rest.tools.utils.NetworkUtils;
+import org.folio.support.RestVerticleDeployer;
 import org.folio.support.VertxAssistant;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -18,7 +17,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class RecordsApiTest {
   private static final VertxAssistant vertxAssistant = new VertxAssistant();
   private static final Integer MODULE_PORT = NetworkUtils.nextFreePort();
-  private static String verticleId;
+  private static final RestVerticleDeployer deployer = new RestVerticleDeployer(
+    vertxAssistant, MODULE_PORT);
 
   @BeforeClass
   public static void beforeAll()
@@ -28,9 +28,7 @@ public class RecordsApiTest {
 
     vertxAssistant.start();
 
-    final JsonObject config = new JsonObject().put("http.port", MODULE_PORT);
-
-    verticleId = vertxAssistant.deployVerticle(RestVerticle.class, config)
+    deployer.deploy()
       .get(20, TimeUnit.SECONDS);
   }
 
@@ -40,7 +38,7 @@ public class RecordsApiTest {
     ExecutionException,
     TimeoutException {
 
-    vertxAssistant.undeployVerticle(verticleId)
+    deployer.undeploy()
       .thenApplyAsync(v -> vertxAssistant.stop())
       .get(20, TimeUnit.SECONDS);
   }
