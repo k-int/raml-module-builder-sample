@@ -68,6 +68,13 @@ public class RestAssuredClient {
       .extract().response());
   }
 
+  public Response get() throws MalformedURLException {
+    return from(
+      get(urlMaker.combine(""))
+        .statusCode(200)
+        .extract().response());
+  }
+
   private io.restassured.response.Response post(
     URL url,
     JsonObject representation) {

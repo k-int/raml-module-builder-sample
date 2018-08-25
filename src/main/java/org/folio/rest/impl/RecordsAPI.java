@@ -4,10 +4,12 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Handler;
 import org.folio.rest.jaxrs.model.Record;
+import org.folio.rest.jaxrs.model.Records;
 import org.folio.rest.jaxrs.resource.RecordsResource;
 import org.folio.rest.tools.utils.OutStream;
 
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -38,7 +40,11 @@ public class RecordsAPI implements RecordsResource {
       asyncResultHandler,
     Context vertxContext) {
 
-    asyncResultHandler.handle(succeededFuture(notImplemented()));
+    asyncResultHandler.handle(succeededFuture(
+      GetRecordsResponse.withJsonOK(
+        new Records()
+          .withTotalRecords(records.size())
+          .withRecords(new ArrayList<>(records.values())))));
   }
 
   @Override

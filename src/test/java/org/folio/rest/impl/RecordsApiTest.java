@@ -11,15 +11,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import static org.folio.support.InterfaceUrls.Records;
+import static org.folio.support.JsonArrayHelper.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 public class RecordsApiTest {
   private static final String TENANT_ID = "test_tenant";
@@ -80,8 +84,10 @@ public class RecordsApiTest {
 
     final Response response = client.get(id);
 
-    assertThat(response.getBodyAsJson().getString("id"), is(id.toString()));
-    assertThat(response.getBodyAsJson().getString("name"), is("Example Record"));
+    final JsonObject createdRecord = response.getBodyAsJson();
+
+    assertThat(createdRecord.getString("id"), is(id.toString()));
+    assertThat(createdRecord.getString("name"), is("Example Record"));
   }
 
   @Test
@@ -92,6 +98,38 @@ public class RecordsApiTest {
 
     assertThat(getResponse.getStatusCode(), is(404));
     assertThat(getResponse.getBody(), is("Not Found"));
+  }
+
+  @Test
+  public void shouldBeAbleToGetAllRecords() throws MalformedURLException {
+    client.postToCreate(exampleRecord("First record"));
+    client.postToCreate(exampleRecord("Second record"));
+    client.postToCreate(exampleRecord("Third record"));
+
+    final Response response = client.get();
+
+    final JsonObject wrappedRecords = response.getBodyAsJson();
+
+    assertThat(wrappedRecords.getInteger("totalRecords"), is(3));
+
+    final List<JsonObject> records = toList(wrappedRecords, "records");
+
+    assertThat(records.size(), is(3));
+
+    records.forEach(record -> {
+      assertThat("Should have id property", record.containsKey("id"), is(true));
+      assertThat("id property should not be empty", record.getString("id"), is(notNullValue()));
+    });
+
+    final List<String> names = records.stream()
+      .map(record -> record.getString("name"))
+      .collect(Collectors.toList());
+
+    assertThat(names, containsInAnyOrder(
+      "First record",
+      "Second record",
+      "Third record"));
+
   }
 
   @Test
@@ -128,7 +166,11 @@ public class RecordsApiTest {
   }
 
   private JsonObject exampleRecord() {
+    return exampleRecord("Example Record");
+  }
+
+  private JsonObject exampleRecord(String name) {
     return new JsonObject()
-      .put("name", "Example Record");
+      .put("name", name);
   }
 }
