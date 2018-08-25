@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.HttpClientConfig;
 import io.restassured.specification.RequestSpecification;
+import io.vertx.core.json.JsonObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,23 +37,44 @@ public class RestAssuredClient {
     return from(get(urlMaker.combine(String.format("/%s", id))));
   }
 
+  public Response postToCreate(JsonObject representation) throws MalformedURLException {
+    return from(post(urlMaker.combine(""), representation));
+  }
+
+  private io.restassured.response.Response post(
+    URL url,
+    JsonObject representation) {
+
+    return given()
+      .log().all()
+      .spec(defaultHeaders())
+      .spec(timeoutConfig())
+      .body(representation.encodePrettily())
+      .when().post(url)
+      .then()
+      .log().all()
+      .statusCode(201)
+      .extract().response();
+  }
+
   private io.restassured.response.Response get(URL url) {
     return given()
       .log().all()
-      .spec(defaultHeaders("from-tests"))
+      .spec(defaultHeaders())
       .spec(timeoutConfig())
       .when().get(url)
       .then()
       .log().all()
+      .statusCode(200)
       .extract().response();
   }
 
-  private RequestSpecification defaultHeaders(String requestId) {
+  private RequestSpecification defaultHeaders() {
     return new RequestSpecBuilder()
       .addHeader(TENANT.getValue(), tenantId)
       .addHeader(TOKEN.getValue(), token)
       .addHeader(USER_ID.getValue(), userId)
-      .addHeader(REQUEST_ID.getValue(), requestId)
+      .addHeader(REQUEST_ID.getValue(), "from-tests")
       .setAccept("application/json, text/plain")
       .setContentType("application/json")
       .build();

@@ -1,5 +1,6 @@
 package org.folio.rest.impl;
 
+import io.vertx.core.json.JsonObject;
 import org.folio.support.Response;
 import org.folio.support.RestAssuredClient;
 import org.folio.support.RestVerticleDeployer;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.folio.support.InterfaceUrls.Records;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RecordsApiTest {
@@ -55,12 +57,22 @@ public class RecordsApiTest {
   }
 
   @Test
-  public void shouldBeAbleToGetARecord() throws MalformedURLException {
+  public void shouldBeAbleToCreateRecord() throws MalformedURLException {
+    final Response response = client.postToCreate(new JsonObject()
+      .put("name", "Example Record"));
+
+    final JsonObject createdRecord = response.getBodyAsJson();
+
+    assertThat(createdRecord.getString("id"), is(notNullValue()));
+    assertThat(createdRecord.getString("name"), is("Example Record"));
+  }
+
+  @Test
+  public void shouldBeAbleToGetCreatedRecord() throws MalformedURLException {
     final UUID id = UUID.randomUUID();
 
     final Response response = client.getById(id);
 
-    assertThat(response.getStatusCode(), is(200));
     assertThat(response.getBodyAsJson().getString("id"), is(id.toString()));
     assertThat(response.getBodyAsJson().getString("name"), is("Example Record"));
   }
