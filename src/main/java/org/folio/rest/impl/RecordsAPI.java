@@ -117,13 +117,16 @@ public class RecordsAPI implements RecordsResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
 
-    asyncResultHandler.handle(succeededFuture(notImplemented()));
-  }
+    //TODO: Validate that ID in representation matches URL parameter
 
-  private Response notImplemented() {
-    return Response.status(501)
-      .header("Content-Type", "text/plain")
-      .entity("Not Implemented")
-      .build();
+    if(records.containsKey(recordId)) {
+      records.replace(recordId, entity);
+      asyncResultHandler.handle(succeededFuture(
+        PutRecordsByRecordIdResponse.withNoContent()));
+    }
+    else {
+      asyncResultHandler.handle(succeededFuture(
+        PutRecordsByRecordIdResponse.withPlainNotFound("Not Found")));
+    }
   }
 }

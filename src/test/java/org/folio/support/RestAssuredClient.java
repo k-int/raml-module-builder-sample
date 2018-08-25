@@ -75,6 +75,21 @@ public class RestAssuredClient {
         .extract().response());
   }
 
+  public Response replace(UUID id, JsonObject representation)
+    throws MalformedURLException {
+
+    return from(put(individualRecordUrl(id), representation)
+      .statusCode(204)
+      .extract().response());
+  }
+
+  public Response attemptReplace(UUID id, JsonObject representation)
+    throws MalformedURLException {
+
+      return from(put(individualRecordUrl(id), representation)
+        .extract().response());
+  }
+
   private io.restassured.response.Response post(
     URL url,
     JsonObject representation) {
@@ -89,6 +104,17 @@ public class RestAssuredClient {
       .log().all()
       .statusCode(201)
       .extract().response();
+  }
+
+  private ValidatableResponse put(URL url, JsonObject representation) {
+    return given()
+      .log().all()
+      .spec(defaultHeaders())
+      .spec(timeoutConfig())
+      .body(representation.encodePrettily())
+      .when().put(url)
+      .then()
+      .log().all();
   }
 
   private ValidatableResponse delete(URL url) {

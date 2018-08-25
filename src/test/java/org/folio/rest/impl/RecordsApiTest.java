@@ -69,9 +69,9 @@ public class RecordsApiTest {
 
   @Test
   public void shouldBeAbleToCreateRecord() throws MalformedURLException {
-    final Response response = client.postToCreate(exampleRecord());
+    final Response postResponse = client.postToCreate(exampleRecord());
 
-    final JsonObject createdRecord = response.getBodyAsJson();
+    final JsonObject createdRecord = postResponse.getBodyAsJson();
 
     assertThat(createdRecord.getString("id"), is(notNullValue()));
     assertThat(createdRecord.getString("name"), is("Example Record"));
@@ -81,12 +81,12 @@ public class RecordsApiTest {
   public void shouldBeAbleToCreateRecordWithId() throws MalformedURLException {
     final UUID providedId = UUID.randomUUID();
 
-    final Response response = client.postToCreate(
+    final Response postResponse = client.postToCreate(
       new JsonObject()
         .put("id", providedId.toString())
         .put("name", "Example Record"));
 
-    final JsonObject createdRecord = response.getBodyAsJson();
+    final JsonObject createdRecord = postResponse.getBodyAsJson();
 
     assertThat(createdRecord.getString("id"), is(providedId.toString()));
     assertThat(createdRecord.getString("name"), is("Example Record"));
@@ -98,9 +98,9 @@ public class RecordsApiTest {
 
     final UUID id = createResponse.getId();
 
-    final Response response = client.get(id);
+    final Response getResponse = client.get(id);
 
-    final JsonObject createdRecord = response.getBodyAsJson();
+    final JsonObject createdRecord = getResponse.getBodyAsJson();
 
     assertThat(createdRecord.getString("id"), is(id.toString()));
     assertThat(createdRecord.getString("name"), is("Example Record"));
@@ -122,9 +122,9 @@ public class RecordsApiTest {
     client.postToCreate(exampleRecord("Second record"));
     client.postToCreate(exampleRecord("Third record"));
 
-    final Response response = client.get();
+    final Response getResponse = client.get();
 
-    final JsonObject wrappedRecords = response.getBodyAsJson();
+    final JsonObject wrappedRecords = getResponse.getBodyAsJson();
 
     assertThat(wrappedRecords.getInteger("totalRecords"), is(3));
 
@@ -145,7 +145,42 @@ public class RecordsApiTest {
       "First record",
       "Second record",
       "Third record"));
+  }
 
+  @Test
+  public void shouldBeAbleToReplaceARecord() throws MalformedURLException {
+    final Response postResponse = client.postToCreate(exampleRecord());
+
+    final UUID id = postResponse.getId();
+
+    //Replace with builder
+    client.replace(id, new JsonObject()
+      .put("id", id.toString())
+      .put("name", "A different name"));
+
+    final Response getResponse = client.get(id);
+
+    final JsonObject createdRecord = getResponse.getBodyAsJson();
+
+    assertThat(createdRecord.getString("id"), is(id.toString()));
+    assertThat(createdRecord.getString("name"), is("A different name"));
+  }
+
+  @Test
+  public void shouldBeAbleToAttemptingReplacingAnUnknownRecord()
+    throws MalformedURLException {
+
+    final UUID id = UUID.randomUUID();
+
+    final JsonObject representation = new JsonObject()
+      .put("id", id.toString())
+      .put("name", "A name");
+
+    final Response putResponse = client.attemptReplace(id, representation);
+
+    //TODO: Replace duplicated not found assertions with response matcher
+    assertThat(putResponse.getStatusCode(), is(404));
+    assertThat(putResponse.getBody(), is("Not Found"));
   }
 
   @Test
