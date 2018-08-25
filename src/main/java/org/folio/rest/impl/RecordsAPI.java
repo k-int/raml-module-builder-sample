@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static io.vertx.core.Future.succeededFuture;
 
@@ -84,7 +85,7 @@ public class RecordsAPI implements RecordsResource {
     }
     else {
       asyncResultHandler.handle(succeededFuture(
-        GetRecordsByRecordIdResponse.withPlainNotFound("Not Found")));
+        notFoundResponse(GetRecordsByRecordIdResponse::withPlainNotFound)));
     }
   }
 
@@ -104,7 +105,7 @@ public class RecordsAPI implements RecordsResource {
     }
     else {
       asyncResultHandler.handle(succeededFuture(
-        DeleteRecordsByRecordIdResponse.withPlainNotFound("Not Found")));
+        notFoundResponse(DeleteRecordsByRecordIdResponse::withPlainNotFound)));
     }
   }
 
@@ -118,7 +119,6 @@ public class RecordsAPI implements RecordsResource {
     Context vertxContext) {
 
     //TODO: Validate that ID in representation matches URL parameter
-
     if(records.containsKey(recordId)) {
       records.replace(recordId, entity);
       asyncResultHandler.handle(succeededFuture(
@@ -126,7 +126,11 @@ public class RecordsAPI implements RecordsResource {
     }
     else {
       asyncResultHandler.handle(succeededFuture(
-        PutRecordsByRecordIdResponse.withPlainNotFound("Not Found")));
+        notFoundResponse(PutRecordsByRecordIdResponse::withPlainNotFound)));
     }
+  }
+
+  private Response notFoundResponse(Function<String, Response> notFoundResponseFactory) {
+    return notFoundResponseFactory.apply("Not Found");
   }
 }
