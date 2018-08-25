@@ -8,12 +8,15 @@ import org.folio.rest.jaxrs.resource.RecordsResource;
 import org.folio.rest.tools.utils.OutStream;
 
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import static io.vertx.core.Future.succeededFuture;
 
 public class RecordsAPI implements RecordsResource {
+  private static final Map<String, Record> records = new HashMap<>();
+
   @Override
   public void getRecords(
     String lang, Map<String, String> okapiHeaders,
@@ -32,7 +35,10 @@ public class RecordsAPI implements RecordsResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
 
+    //TODO: Allow creation with client supplied ID
     entity.setId(UUID.randomUUID().toString());
+
+    records.put(entity.getId(), entity);
 
     OutStream stream = new OutStream();
     stream.setData(entity);
@@ -50,11 +56,15 @@ public class RecordsAPI implements RecordsResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
 
-    asyncResultHandler.handle(succeededFuture(
-      GetRecordsByRecordIdResponse.withJsonOK(
-        new Record()
-          .withId(recordId)
-          .withName("Example Record"))));
+    if(records.containsKey(recordId)) {
+      asyncResultHandler.handle(succeededFuture(
+        GetRecordsByRecordIdResponse.withJsonOK(
+          records.get(recordId))));
+    }
+    else {
+      asyncResultHandler.handle(succeededFuture(
+        GetRecordsByRecordIdResponse.withPlainNotFound("Not Found")));
+    }
   }
 
   @Override

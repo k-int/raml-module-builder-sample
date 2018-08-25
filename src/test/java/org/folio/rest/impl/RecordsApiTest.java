@@ -58,8 +58,9 @@ public class RecordsApiTest {
 
   @Test
   public void shouldBeAbleToCreateRecord() throws MalformedURLException {
-    final Response response = client.postToCreate(new JsonObject()
-      .put("name", "Example Record"));
+    final Response response = client.postToCreate(
+      new JsonObject()
+        .put("name", "Example Record"));
 
     final JsonObject createdRecord = response.getBodyAsJson();
 
@@ -69,11 +70,25 @@ public class RecordsApiTest {
 
   @Test
   public void shouldBeAbleToGetCreatedRecord() throws MalformedURLException {
-    final UUID id = UUID.randomUUID();
+    final Response createResponse = client.postToCreate(
+      new JsonObject()
+        .put("name", "Example Record"));
+
+    final UUID id = createResponse.getId();
 
     final Response response = client.getById(id);
 
     assertThat(response.getBodyAsJson().getString("id"), is(id.toString()));
     assertThat(response.getBodyAsJson().getString("name"), is("Example Record"));
+  }
+
+  @Test
+  public void shouldNotBeAbleToGetUnknownRecord() throws MalformedURLException {
+    final UUID id = UUID.randomUUID();
+
+    final Response response = client.attemptGetById(id);
+
+    assertThat(response.getStatusCode(), is(404));
+    assertThat(response.getBody(), is("Not Found"));
   }
 }

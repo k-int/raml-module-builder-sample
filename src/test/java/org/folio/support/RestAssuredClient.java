@@ -3,6 +3,7 @@ package org.folio.support;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.HttpClientConfig;
+import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.vertx.core.json.JsonObject;
 
@@ -34,7 +35,16 @@ public class RestAssuredClient {
   }
 
   public Response getById(UUID id) throws MalformedURLException {
-    return from(get(urlMaker.combine(String.format("/%s", id))));
+    return from(
+      get(getByIdUrl(id))
+        .statusCode(200)
+        .extract().response());
+  }
+
+  public Response attemptGetById(UUID id) throws MalformedURLException {
+    return from(
+      get(getByIdUrl(id))
+        .extract().response());
   }
 
   public Response postToCreate(JsonObject representation) throws MalformedURLException {
@@ -57,16 +67,14 @@ public class RestAssuredClient {
       .extract().response();
   }
 
-  private io.restassured.response.Response get(URL url) {
+  private ValidatableResponse get(URL url) {
     return given()
       .log().all()
       .spec(defaultHeaders())
       .spec(timeoutConfig())
       .when().get(url)
       .then()
-      .log().all()
-      .statusCode(200)
-      .extract().response();
+      .log().all();
   }
 
   private RequestSpecification defaultHeaders() {
@@ -90,5 +98,9 @@ public class RestAssuredClient {
 
   private Response from(io.restassured.response.Response response) {
     return new Response(response.statusCode(), response.body().print());
+  }
+
+  private URL getByIdUrl(UUID id) throws MalformedURLException {
+    return urlMaker.combine(String.format("/%s", id));
   }
 }

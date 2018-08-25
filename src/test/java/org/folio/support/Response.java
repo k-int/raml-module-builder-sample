@@ -2,6 +2,8 @@ package org.folio.support;
 
 import io.vertx.core.json.JsonObject;
 
+import java.util.UUID;
+
 public class Response {
   private final Integer statusCode;
   private final String body;
@@ -10,6 +12,7 @@ public class Response {
     this.statusCode = statusCode;
     this.body = body;
   }
+
 
   public Integer getStatusCode() {
     return statusCode;
@@ -21,5 +24,9 @@ public class Response {
 
   public JsonObject getBodyAsJson() {
     return new JsonObject(getBody());
+  }
+
+  public UUID getId() {
+    return UUID.fromString(getBodyAsJson().getString("id"));
   }
 }
