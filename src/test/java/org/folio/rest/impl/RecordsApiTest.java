@@ -6,6 +6,7 @@ import org.folio.support.RestAssuredClient;
 import org.folio.support.RestVerticleDeployer;
 import org.folio.support.VertxAssistant;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -54,6 +55,11 @@ public class RecordsApiTest {
     deployer.undeploy()
       .thenApplyAsync(v -> vertxAssistant.stop())
       .get(20, TimeUnit.SECONDS);
+  }
+
+  @Before
+  public void beforeEach() throws MalformedURLException {
+    client.delete();
   }
 
   @Test

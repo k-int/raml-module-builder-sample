@@ -14,8 +14,22 @@ import java.util.UUID;
 
 import static io.vertx.core.Future.succeededFuture;
 
+//TODO: Support multiple tenants
 public class RecordsAPI implements RecordsResource {
   private static final Map<String, Record> records = new HashMap<>();
+
+  @Override
+  public void deleteRecords(
+    String lang,
+    Map<String, String> okapiHeaders,
+    Handler<AsyncResult<Response>> asyncResultHandler,
+    Context vertxContext) {
+
+    records.clear();
+
+    asyncResultHandler.handle(succeededFuture(
+      DeleteRecordsResponse.withNoContent()));
+  }
 
   @Override
   public void getRecords(
