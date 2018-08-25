@@ -34,21 +34,32 @@ public class RestAssuredClient {
     this.urlMaker = urlMaker;
   }
 
-  public Response getById(UUID id) throws MalformedURLException {
+  public Response get(UUID id) throws MalformedURLException {
     return from(
-      get(getByIdUrl(id))
+      get(individualRecordUrl(id))
         .statusCode(200)
         .extract().response());
   }
 
-  public Response attemptGetById(UUID id) throws MalformedURLException {
+  public Response attemptGet(UUID id) throws MalformedURLException {
     return from(
-      get(getByIdUrl(id))
+      get(individualRecordUrl(id))
         .extract().response());
   }
 
   public Response postToCreate(JsonObject representation) throws MalformedURLException {
     return from(post(urlMaker.combine(""), representation));
+  }
+
+  public Response delete(UUID id) throws MalformedURLException {
+    return from(delete(individualRecordUrl(id))
+      .statusCode(204)
+      .extract().response());
+  }
+
+  public Response attemptDelete(UUID id) throws MalformedURLException {
+    return from(delete(individualRecordUrl(id))
+      .extract().response());
   }
 
   private io.restassured.response.Response post(
@@ -65,6 +76,16 @@ public class RestAssuredClient {
       .log().all()
       .statusCode(201)
       .extract().response();
+  }
+
+  private ValidatableResponse delete(URL url) {
+    return given()
+      .log().all()
+      .spec(defaultHeaders())
+      .spec(timeoutConfig())
+      .when().delete(url)
+      .then()
+      .log().all();
   }
 
   private ValidatableResponse get(URL url) {
@@ -100,7 +121,7 @@ public class RestAssuredClient {
     return new Response(response.statusCode(), response.body().print());
   }
 
-  private URL getByIdUrl(UUID id) throws MalformedURLException {
+  private URL individualRecordUrl(UUID id) throws MalformedURLException {
     return urlMaker.combine(String.format("/%s", id));
   }
 }

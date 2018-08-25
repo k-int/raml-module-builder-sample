@@ -75,7 +75,16 @@ public class RecordsAPI implements RecordsResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
 
-    asyncResultHandler.handle(succeededFuture(notImplemented()));
+    if(records.containsKey(recordId)) {
+      records.remove(recordId);
+
+      asyncResultHandler.handle(succeededFuture(
+        DeleteRecordsByRecordIdResponse.withNoContent()));
+    }
+    else {
+      asyncResultHandler.handle(succeededFuture(
+        DeleteRecordsByRecordIdResponse.withPlainNotFound("Not Found")));
+    }
   }
 
   @Override

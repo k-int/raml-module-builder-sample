@@ -58,9 +58,7 @@ public class RecordsApiTest {
 
   @Test
   public void shouldBeAbleToCreateRecord() throws MalformedURLException {
-    final Response response = client.postToCreate(
-      new JsonObject()
-        .put("name", "Example Record"));
+    final Response response = client.postToCreate(exampleRecord());
 
     final JsonObject createdRecord = response.getBodyAsJson();
 
@@ -70,13 +68,11 @@ public class RecordsApiTest {
 
   @Test
   public void shouldBeAbleToGetCreatedRecord() throws MalformedURLException {
-    final Response createResponse = client.postToCreate(
-      new JsonObject()
-        .put("name", "Example Record"));
+    final Response createResponse = client.postToCreate(exampleRecord());
 
     final UUID id = createResponse.getId();
 
-    final Response response = client.getById(id);
+    final Response response = client.get(id);
 
     assertThat(response.getBodyAsJson().getString("id"), is(id.toString()));
     assertThat(response.getBodyAsJson().getString("name"), is("Example Record"));
@@ -86,9 +82,47 @@ public class RecordsApiTest {
   public void shouldNotBeAbleToGetUnknownRecord() throws MalformedURLException {
     final UUID id = UUID.randomUUID();
 
-    final Response response = client.attemptGetById(id);
+    final Response getResponse = client.attemptGet(id);
 
-    assertThat(response.getStatusCode(), is(404));
-    assertThat(response.getBody(), is("Not Found"));
+    assertThat(getResponse.getStatusCode(), is(404));
+    assertThat(getResponse.getBody(), is("Not Found"));
+  }
+
+  @Test
+  public void shouldBeAbleToDeleteRecord() throws MalformedURLException {
+    final Response createResponse = client.postToCreate(exampleRecord());
+
+    final UUID id = createResponse.getId();
+
+    client.delete(id);
+  }
+
+  @Test
+  public void shouldNotBeAbleToGetDeletedRecord() throws MalformedURLException {
+    final Response createResponse = client.postToCreate(exampleRecord());
+
+    final UUID id = createResponse.getId();
+
+    client.delete(id);
+
+    final Response getResponse = client.attemptGet(id);
+
+    assertThat(getResponse.getStatusCode(), is(404));
+    assertThat(getResponse.getBody(), is("Not Found"));
+  }
+
+  @Test
+  public void shouldBeAbleToAttemptToDeleteUnknownRecord() throws MalformedURLException {
+    final UUID id = UUID.randomUUID();
+
+    final Response deleteResponse = client.attemptDelete(id);
+
+    assertThat(deleteResponse.getStatusCode(), is(404));
+    assertThat(deleteResponse.getBody(), is("Not Found"));
+  }
+
+  private JsonObject exampleRecord() {
+    return new JsonObject()
+      .put("name", "Example Record");
   }
 }
