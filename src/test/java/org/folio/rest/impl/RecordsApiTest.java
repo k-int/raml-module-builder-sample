@@ -25,6 +25,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
+//TODO: Tests for validation
 public class RecordsApiTest {
   private static final String TENANT_ID = "test_tenant";
   private static final String USER_ID = "762ce50c-8d96-41d5-a5f5-e27780008a83";
@@ -73,6 +74,21 @@ public class RecordsApiTest {
     final JsonObject createdRecord = response.getBodyAsJson();
 
     assertThat(createdRecord.getString("id"), is(notNullValue()));
+    assertThat(createdRecord.getString("name"), is("Example Record"));
+  }
+
+  @Test
+  public void shouldBeAbleToCreateRecordWithId() throws MalformedURLException {
+    final UUID providedId = UUID.randomUUID();
+
+    final Response response = client.postToCreate(
+      new JsonObject()
+        .put("id", providedId.toString())
+        .put("name", "Example Record"));
+
+    final JsonObject createdRecord = response.getBodyAsJson();
+
+    assertThat(createdRecord.getString("id"), is(providedId.toString()));
     assertThat(createdRecord.getString("name"), is("Example Record"));
   }
 

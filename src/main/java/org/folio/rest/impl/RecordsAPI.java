@@ -55,8 +55,9 @@ public class RecordsAPI implements RecordsResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
 
-    //TODO: Allow creation with client supplied ID
-    entity.setId(UUID.randomUUID().toString());
+    if(entity.getId() == null) {
+      entity.setId(UUID.randomUUID().toString());
+    }
 
     records.put(entity.getId(), entity);
 
