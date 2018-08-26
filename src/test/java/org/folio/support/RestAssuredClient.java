@@ -48,7 +48,14 @@ public class RestAssuredClient {
   }
 
   public Response postToCreate(JsonObject representation) throws MalformedURLException {
-    return from(post(rootUrl(), representation));
+    return from(post(rootUrl(), representation)
+      .statusCode(201)
+      .extract().response());
+  }
+
+  public Response attemptPostToCreate(JsonObject representation) throws MalformedURLException {
+    return from(post(rootUrl(), representation)
+      .extract().response());
   }
 
   public Response delete(UUID id) throws MalformedURLException {
@@ -90,7 +97,7 @@ public class RestAssuredClient {
         .extract().response());
   }
 
-  private io.restassured.response.Response post(
+  private ValidatableResponse post(
     URL url,
     JsonObject representation) {
 
@@ -98,12 +105,10 @@ public class RestAssuredClient {
       .log().all()
       .spec(defaultHeaders())
       .spec(timeoutConfig())
-      .body(representation.encodePrettily())
+      .body(getBody(representation))
       .when().post(url)
       .then()
-      .log().all()
-      .statusCode(201)
-      .extract().response();
+      .log().all();
   }
 
   private ValidatableResponse put(URL url, JsonObject representation) {
@@ -111,7 +116,7 @@ public class RestAssuredClient {
       .log().all()
       .spec(defaultHeaders())
       .spec(timeoutConfig())
-      .body(representation.encodePrettily())
+      .body(getBody(representation))
       .when().put(url)
       .then()
       .log().all();
@@ -166,5 +171,11 @@ public class RestAssuredClient {
 
   private URL individualRecordUrl(UUID id) throws MalformedURLException {
     return urlMaker.combine(String.format("/%s", id));
+  }
+
+  private String getBody(JsonObject representation) {
+    if(representation == null) return "";
+
+    return representation.encodePrettily();
   }
 }

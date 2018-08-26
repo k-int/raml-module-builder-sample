@@ -93,6 +93,26 @@ public class RecordsApiTest {
   }
 
   @Test
+  public void shouldNotBeAbleToCreateRecordWithoutName()
+    throws MalformedURLException {
+
+    final Response postResponse = client.attemptPostToCreate(new JsonObject());
+
+    assertThat(postResponse.getStatusCode(), is(422));
+  }
+
+  @Test
+  public void shouldNotBeAbleToCreateRecordWithoutNoRepresentation()
+    throws MalformedURLException {
+
+    final Response postResponse = client.attemptPostToCreate(null);
+
+    assertThat(postResponse.getStatusCode(), is(400));
+    assertThat(postResponse.getBody(),
+      is("Json content error HV000116: The object to be validated must not be null."));
+  }
+
+  @Test
   public void shouldBeAbleToGetCreatedRecord() throws MalformedURLException {
     final Response createResponse = client.postToCreate(exampleRecord());
 
@@ -107,7 +127,9 @@ public class RecordsApiTest {
   }
 
   @Test
-  public void shouldNotBeAbleToGetUnknownRecord() throws MalformedURLException {
+  public void shouldNotBeAbleToGetUnknownRecord()
+    throws MalformedURLException {
+
     final UUID id = UUID.randomUUID();
 
     final Response getResponse = client.attemptGet(id);
@@ -193,7 +215,9 @@ public class RecordsApiTest {
   }
 
   @Test
-  public void shouldNotBeAbleToGetDeletedRecord() throws MalformedURLException {
+  public void shouldNotBeAbleToGetDeletedRecord()
+    throws MalformedURLException {
+
     final Response createResponse = client.postToCreate(exampleRecord());
 
     final UUID id = createResponse.getId();
@@ -207,7 +231,9 @@ public class RecordsApiTest {
   }
 
   @Test
-  public void shouldBeAbleToAttemptToDeleteUnknownRecord() throws MalformedURLException {
+  public void shouldBeAbleToAttemptToDeleteUnknownRecord()
+    throws MalformedURLException {
+
     final UUID id = UUID.randomUUID();
 
     final Response deleteResponse = client.attemptDelete(id);
