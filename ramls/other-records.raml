@@ -1,0 +1,50 @@
+#%RAML 1.0
+
+title: Example Records API
+baseUri: https://localhost/mod-raml-module-builder-sample
+version: 1.0
+
+documentation:
+  - title: Sample RAML Module Builder Module
+    content: This demonstrates some features of the RAML Module Builder
+
+types:
+  other-record: !include other-record.json
+  other-records: !include other-records.json
+  errors: !include raml-util/schemas/errors.schema
+
+traits:
+  validate: !include raml-util/traits/validation.raml
+  secured: !include raml-util/traits/auth.raml
+  language: !include raml-util/traits/language.raml
+  pageable:  !include raml-util/traits/pageable.raml
+  searchable: !include raml-util/traits/searchable.raml
+
+resourceTypes:
+  collection: !include raml-util/rtypes/collection.raml
+  collection-item: !include raml-util/rtypes/item-collection.raml
+
+/example-domain:
+  /other-records:
+    displayName: Records
+    description: Records collection
+    type:
+      collection:
+        schemaCollection: other-records
+        schemaItem: other-record
+        exampleCollection: !include examples/other-records.json
+        exampleItem: !include examples/other-record.json
+    delete:
+      responses:
+        204:
+          description: "All items deleted"
+        500:
+          description: "An error occurred whilst attempting to delete all records"
+          body:
+            text/plain:
+              example: "Internal Server Error"
+    /{recordId}:
+      type:
+        collection-item:
+          exampleItem: !include examples/other-record.json
+          schema: other-record
