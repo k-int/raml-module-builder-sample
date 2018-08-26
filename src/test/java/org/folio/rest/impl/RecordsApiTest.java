@@ -86,6 +86,9 @@ public class RecordsApiTest {
         .put("id", providedId.toString())
         .put("name", "Example Record"));
 
+    assertThat(postResponse.getLocation(),
+      is(String.format("example-domain/records/%s", providedId)));
+
     final JsonObject createdRecord = postResponse.getBodyAsJson();
 
     assertThat(createdRecord.getString("id"), is(providedId.toString()));

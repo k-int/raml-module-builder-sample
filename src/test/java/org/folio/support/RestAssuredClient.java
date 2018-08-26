@@ -162,7 +162,10 @@ public class RestAssuredClient {
   }
 
   private Response from(io.restassured.response.Response response) {
-    return new Response(response.statusCode(), response.body().print());
+    return new Response(
+      response.statusCode(),
+      response.body().print(),
+      response.header("location"));
   }
 
   private URL rootUrl() throws MalformedURLException {

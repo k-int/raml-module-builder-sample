@@ -65,9 +65,10 @@ public class RecordsAPI implements ExampleDomainResource {
     OutStream stream = new OutStream();
     stream.setData(entity);
 
-    //TODO: Generate a location
     asyncResultHandler.handle(succeededFuture(
-      PostExampleDomainRecordsResponse.withJsonCreated("", stream)));
+      PostExampleDomainRecordsResponse.withJsonCreated(
+        String.format("example-domain/records/%s", entity.getId()),
+        stream)));
   }
 
   @Override
