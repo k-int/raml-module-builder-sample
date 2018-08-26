@@ -3,7 +3,7 @@ package org.folio.support;
 import java.net.URL;
 
 public enum InterfaceUrls {
-  Records("/records");
+  Records("/example-domain/records");
 
   private final String basePath;
 

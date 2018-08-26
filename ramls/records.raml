@@ -27,26 +27,27 @@ resourceTypes:
   - collection: !include raml-util/rtypes/collection.raml
   - collection-item: !include raml-util/rtypes/item-collection.raml
 
-/records:
-  displayName: Records
-  description: Records collection
-  type:
-    collection:
-      schemaCollection: records
-      schemaItem: record.json
-      exampleCollection: !include examples/records.json
-      exampleItem: !include examples/record.json
-  delete:
-    responses:
-      204:
-        description: "All items deleted"
-      500:
-        description: "An error occurred whilst attempting to delete all records"
-        body:
-          text/plain:
-            example: "Internal Server Error"
-  /{recordId}:
+/example-domain:
+  /records:
+    displayName: Records
+    description: Records collection
     type:
-      collection-item:
+      collection:
+        schemaCollection: records
+        schemaItem: record.json
+        exampleCollection: !include examples/records.json
         exampleItem: !include examples/record.json
-        schema: record.json
+    delete:
+      responses:
+        204:
+          description: "All items deleted"
+        500:
+          description: "An error occurred whilst attempting to delete all records"
+          body:
+            text/plain:
+              example: "Internal Server Error"
+    /{recordId}:
+      type:
+        collection-item:
+          exampleItem: !include examples/record.json
+          schema: record.json

@@ -5,7 +5,7 @@ import io.vertx.core.Context;
 import io.vertx.core.Handler;
 import org.folio.rest.jaxrs.model.Record;
 import org.folio.rest.jaxrs.model.Records;
-import org.folio.rest.jaxrs.resource.RecordsResource;
+import org.folio.rest.jaxrs.resource.ExampleDomainResource;
 import org.folio.rest.tools.utils.OutStream;
 
 import javax.ws.rs.core.Response;
@@ -18,11 +18,11 @@ import java.util.function.Function;
 import static io.vertx.core.Future.succeededFuture;
 
 //TODO: Support multiple tenants
-public class RecordsAPI implements RecordsResource {
+public class RecordsAPI implements ExampleDomainResource {
   private static final Map<String, Record> records = new HashMap<>();
 
   @Override
-  public void deleteRecords(
+  public void deleteExampleDomainRecords(
     String lang,
     Map<String, String> okapiHeaders,
     Handler<AsyncResult<Response>> asyncResultHandler,
@@ -31,25 +31,25 @@ public class RecordsAPI implements RecordsResource {
     records.clear();
 
     asyncResultHandler.handle(succeededFuture(
-      DeleteRecordsResponse.withNoContent()));
+      DeleteExampleDomainRecordsResponse.withNoContent()));
   }
 
   @Override
-  public void getRecords(
+  public void getExampleDomainRecords(
     String lang, Map<String, String> okapiHeaders,
     Handler<AsyncResult<Response>>
       asyncResultHandler,
     Context vertxContext) {
 
     asyncResultHandler.handle(succeededFuture(
-      GetRecordsResponse.withJsonOK(
+      GetExampleDomainRecordsResponse.withJsonOK(
         new Records()
           .withTotalRecords(records.size())
           .withRecords(new ArrayList<>(records.values())))));
   }
 
   @Override
-  public void postRecords(
+  public void postExampleDomainRecords(
     String lang,
     Record entity,
     Map<String, String> okapiHeaders,
@@ -67,11 +67,11 @@ public class RecordsAPI implements RecordsResource {
 
     //TODO: Generate a location
     asyncResultHandler.handle(succeededFuture(
-      PostRecordsResponse.withJsonCreated("", stream)));
+      PostExampleDomainRecordsResponse.withJsonCreated("", stream)));
   }
 
   @Override
-  public void getRecordsByRecordId(
+  public void getExampleDomainRecordsByRecordId(
     String recordId,
     String lang,
     Map<String, String> okapiHeaders,
@@ -80,17 +80,17 @@ public class RecordsAPI implements RecordsResource {
 
     if(records.containsKey(recordId)) {
       asyncResultHandler.handle(succeededFuture(
-        GetRecordsByRecordIdResponse.withJsonOK(
+        GetExampleDomainRecordsByRecordIdResponse.withJsonOK(
           records.get(recordId))));
     }
     else {
       asyncResultHandler.handle(succeededFuture(
-        notFoundResponse(GetRecordsByRecordIdResponse::withPlainNotFound)));
+        notFoundResponse(GetExampleDomainRecordsByRecordIdResponse::withPlainNotFound)));
     }
   }
 
   @Override
-  public void deleteRecordsByRecordId(
+  public void deleteExampleDomainRecordsByRecordId(
     String recordId,
     String lang,
     Map<String, String> okapiHeaders,
@@ -101,16 +101,16 @@ public class RecordsAPI implements RecordsResource {
       records.remove(recordId);
 
       asyncResultHandler.handle(succeededFuture(
-        DeleteRecordsByRecordIdResponse.withNoContent()));
+        DeleteExampleDomainRecordsByRecordIdResponse.withNoContent()));
     }
     else {
       asyncResultHandler.handle(succeededFuture(
-        notFoundResponse(DeleteRecordsByRecordIdResponse::withPlainNotFound)));
+        notFoundResponse(DeleteExampleDomainRecordsByRecordIdResponse::withPlainNotFound)));
     }
   }
 
   @Override
-  public void putRecordsByRecordId(
+  public void putExampleDomainRecordsByRecordId(
     String recordId,
     String lang,
     Record entity,
@@ -122,11 +122,11 @@ public class RecordsAPI implements RecordsResource {
     if(records.containsKey(recordId)) {
       records.replace(recordId, entity);
       asyncResultHandler.handle(succeededFuture(
-        PutRecordsByRecordIdResponse.withNoContent()));
+        PutExampleDomainRecordsByRecordIdResponse.withNoContent()));
     }
     else {
       asyncResultHandler.handle(succeededFuture(
-        notFoundResponse(PutRecordsByRecordIdResponse::withPlainNotFound)));
+        notFoundResponse(PutExampleDomainRecordsByRecordIdResponse::withPlainNotFound)));
     }
   }
 
