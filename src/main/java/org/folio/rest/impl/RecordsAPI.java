@@ -5,7 +5,6 @@ import io.vertx.core.Context;
 import io.vertx.core.Handler;
 import org.folio.rest.jaxrs.model.Record;
 import org.folio.rest.jaxrs.model.Records;
-import org.folio.rest.jaxrs.resource.ExampleDomainResource;
 import org.folio.rest.tools.utils.OutStream;
 
 import javax.ws.rs.core.Response;
@@ -18,12 +17,11 @@ import java.util.function.Function;
 import static io.vertx.core.Future.succeededFuture;
 
 //TODO: Support multiple tenants
-public class RecordsAPI implements ExampleDomainResource {
+public class RecordsAPI implements org.folio.rest.jaxrs.resource.ExampleDomain {
   private static final Map<String, Record> records = new HashMap<>();
 
   @Override
   public void deleteExampleDomainRecords(
-    String lang,
     Map<String, String> okapiHeaders,
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
@@ -31,7 +29,7 @@ public class RecordsAPI implements ExampleDomainResource {
     records.clear();
 
     asyncResultHandler.handle(succeededFuture(
-      DeleteExampleDomainRecordsResponse.withNoContent()));
+      DeleteExampleDomainRecordsResponse.respond204()));
   }
 
   @Override
@@ -42,7 +40,7 @@ public class RecordsAPI implements ExampleDomainResource {
     Context vertxContext) {
 
     asyncResultHandler.handle(succeededFuture(
-      GetExampleDomainRecordsResponse.withJsonOK(
+      GetExampleDomainRecordsResponse.respond200WithApplicationJson(
         new Records()
           .withTotalRecords(records.size())
           .withRecords(new ArrayList<>(records.values())))));
@@ -65,10 +63,12 @@ public class RecordsAPI implements ExampleDomainResource {
     OutStream stream = new OutStream();
     stream.setData(entity);
 
+    final String location = String.format("example-domain/records/%s", entity.getId());
+
     asyncResultHandler.handle(succeededFuture(
-      PostExampleDomainRecordsResponse.withJsonCreated(
-        String.format("example-domain/records/%s", entity.getId()),
-        stream)));
+      PostExampleDomainRecordsResponse.respond201WithApplicationJson(stream,
+        PostExampleDomainRecordsResponse.headersFor201()
+          .withLocation(location))));
   }
 
   @Override
@@ -81,12 +81,13 @@ public class RecordsAPI implements ExampleDomainResource {
 
     if(records.containsKey(recordId)) {
       asyncResultHandler.handle(succeededFuture(
-        GetExampleDomainRecordsByRecordIdResponse.withJsonOK(
+        GetExampleDomainRecordsByRecordIdResponse.respond200WithApplicationJson(
           records.get(recordId))));
     }
     else {
       asyncResultHandler.handle(succeededFuture(
-        notFoundResponse(GetExampleDomainRecordsByRecordIdResponse::withPlainNotFound)));
+        notFoundResponse(
+          GetExampleDomainRecordsByRecordIdResponse::respond404WithTextPlain)));
     }
   }
 
@@ -102,11 +103,12 @@ public class RecordsAPI implements ExampleDomainResource {
       records.remove(recordId);
 
       asyncResultHandler.handle(succeededFuture(
-        DeleteExampleDomainRecordsByRecordIdResponse.withNoContent()));
+        DeleteExampleDomainRecordsByRecordIdResponse.respond204()));
     }
     else {
       asyncResultHandler.handle(succeededFuture(
-        notFoundResponse(DeleteExampleDomainRecordsByRecordIdResponse::withPlainNotFound)));
+        notFoundResponse(
+          DeleteExampleDomainRecordsByRecordIdResponse::respond404WithTextPlain)));
     }
   }
 
@@ -123,15 +125,18 @@ public class RecordsAPI implements ExampleDomainResource {
     if(records.containsKey(recordId)) {
       records.replace(recordId, entity);
       asyncResultHandler.handle(succeededFuture(
-        PutExampleDomainRecordsByRecordIdResponse.withNoContent()));
+        PutExampleDomainRecordsByRecordIdResponse.respond204()));
     }
     else {
       asyncResultHandler.handle(succeededFuture(
-        notFoundResponse(PutExampleDomainRecordsByRecordIdResponse::withPlainNotFound)));
+        notFoundResponse(
+          PutExampleDomainRecordsByRecordIdResponse::respond404WithTextPlain)));
     }
   }
 
-  private Response notFoundResponse(Function<String, Response> notFoundResponseFactory) {
+  private Response notFoundResponse(
+    Function<String, Response> notFoundResponseFactory) {
+    
     return notFoundResponseFactory.apply("Not Found");
   }
 }

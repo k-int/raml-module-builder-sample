@@ -25,13 +25,18 @@
       <name>FOLIO Maven repository</name>
       <url>https://repository.folio.org/repository/maven-folio</url>
     </repository>
+    <repository>
+      <id>folio-snapshot-nexus</id>
+      <name>FOLIO Maven Snapshot repository</name>
+      <url>https://repository.folio.org/repository/maven-snapshots</url>
+    </repository>
   </repositories>
 
   <dependencies>
     <dependency>
       <groupId>org.folio</groupId>
       <artifactId>domain-models-runtime</artifactId>
-      <version>19.3.1</version>
+      <version>20.0.0-20180825.034756-23</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
