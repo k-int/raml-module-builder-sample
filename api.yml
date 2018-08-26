@@ -9,6 +9,7 @@ raml-module-builder-sample:
     directory: ramls
     files:
       - records
+      - other-records
     ramlutil: ramls/raml-util
 
 # Leave the following two tables (raml-module-builder, raml) at the bottom.
