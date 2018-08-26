@@ -47,6 +47,8 @@ public class RecordsApiTest {
     deployer.deploy()
       .get(20, TimeUnit.SECONDS);
 
+    Thread.sleep(5000);
+
     client = new RestAssuredClient(TENANT_ID, USER_ID, TOKEN,
       Records.urlsBasedUpon(deployer.getLocation()));
   }
