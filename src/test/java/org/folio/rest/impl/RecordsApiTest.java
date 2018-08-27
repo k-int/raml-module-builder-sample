@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import static org.folio.support.InterfaceUrls.Records;
 import static org.folio.support.JsonArrayHelper.toList;
 import static org.folio.support.matchers.ValidationErrorMatchers.hasMessage;
+import static org.folio.support.matchers.ValidationErrorMatchers.hasMessageContaining;
 import static org.folio.support.matchers.ValidationErrorMatchers.hasParameter;
 import static org.folio.support.matchers.ValidationResponseMatchers.isValidationErrorWith;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -108,6 +109,19 @@ public class RecordsApiTest {
     assertThat(postResponse, isValidationErrorWith(allOf(
       hasMessage("may not be null"),
       hasParameter("name", "null"))));
+  }
+
+  @Test
+  public void shouldNotBeAbleToCreateRecordWithAdditionalProperty()
+    throws MalformedURLException {
+
+    final Response postResponse = client.attemptPostToCreate(
+      new JsonObject()
+        .put("name", "Example record")
+        .put("additionalProperty", "foo"));
+
+    assertThat(postResponse, isValidationErrorWith(
+      hasMessageContaining("Unrecognized field \"additionalProperty\"")));
   }
 
   @Test

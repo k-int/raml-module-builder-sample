@@ -10,6 +10,7 @@ import org.hamcrest.core.IsCollectionContaining;
 import java.util.List;
 import java.util.Objects;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 
 public class ValidationErrorMatchers {
@@ -92,6 +93,24 @@ public class ValidationErrorMatchers {
       @Override
       protected boolean matchesSafely(JsonObject error, Description description) {
         final Matcher<String> matcher = is(message);
+
+        matcher.describeMismatch(error, description);
+
+        return matcher.matches(error.getString("message"));
+      }
+    };
+  }
+
+  public static TypeSafeDiagnosingMatcher<JsonObject> hasMessageContaining(String message) {
+    return new TypeSafeDiagnosingMatcher<JsonObject>() {
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("has message containing ").appendValue(message);
+      }
+
+      @Override
+      protected boolean matchesSafely(JsonObject error, Description description) {
+        final Matcher<String> matcher = containsString(message);
 
         matcher.describeMismatch(error, description);
 
