@@ -10,6 +10,12 @@ import org.folio.rest.jaxrs.resource.ExampleDomainResource
 import org.folio.rest.tools.utils.OutStream
 import java.util.*
 import javax.ws.rs.core.Response
+import org.folio.rest.jaxrs.resource.ExampleDomainResource.DeleteExampleDomainRecordsByRecordIdResponse as DeleteByIdResponse
+import org.folio.rest.jaxrs.resource.ExampleDomainResource.DeleteExampleDomainRecordsResponse as DeleteResponse
+import org.folio.rest.jaxrs.resource.ExampleDomainResource.GetExampleDomainRecordsByRecordIdResponse as GetByIdResponse
+import org.folio.rest.jaxrs.resource.ExampleDomainResource.GetExampleDomainRecordsResponse as GetResponse
+import org.folio.rest.jaxrs.resource.ExampleDomainResource.PostExampleDomainRecordsResponse as PostResponse
+import org.folio.rest.jaxrs.resource.ExampleDomainResource.PutExampleDomainRecordsByRecordIdResponse as PutResponse
 
 //TODO: Support multiple tenants
 class RecordsApi : ExampleDomainResource {
@@ -25,8 +31,7 @@ class RecordsApi : ExampleDomainResource {
 
     records.clear()
 
-    asyncResultHandler?.respond(
-      ExampleDomainResource.DeleteExampleDomainRecordsResponse.withNoContent())
+    asyncResultHandler?.respond(DeleteResponse.withNoContent())
   }
 
   override fun getExampleDomainRecords(
@@ -35,11 +40,10 @@ class RecordsApi : ExampleDomainResource {
     asyncResultHandler: Handler<AsyncResult<Response>>?,
     vertxContext: Context?) {
 
-    asyncResultHandler?.respond(
-      ExampleDomainResource.GetExampleDomainRecordsResponse.withJsonOK(
-        Records()
-          .withTotalRecords(records.size)
-          .withRecords(ArrayList(records.values))))
+    asyncResultHandler?.respond(GetResponse.withJsonOK(
+      Records()
+        .withTotalRecords(records.size)
+        .withRecords(ArrayList(records.values))))
   }
 
   override fun postExampleDomainRecords(
@@ -58,9 +62,7 @@ class RecordsApi : ExampleDomainResource {
 
     val location = "example-domain/records/${entity.id}"
 
-    asyncResultHandler?.respond(
-      ExampleDomainResource.PostExampleDomainRecordsResponse
-        .withJsonCreated(location, stream))
+    asyncResultHandler?.respond(PostResponse.withJsonCreated(location, stream))
   }
 
   override fun getExampleDomainRecordsByRecordId(
@@ -70,15 +72,10 @@ class RecordsApi : ExampleDomainResource {
     asyncResultHandler: Handler<AsyncResult<Response>>?,
     vertxContext: Context?) {
 
-    if(records.containsKey(recordId)) {
-      asyncResultHandler?.respond(
-        ExampleDomainResource.GetExampleDomainRecordsByRecordIdResponse
-          .withJsonOK(records[recordId]))
-    }
-    else {
-      asyncResultHandler?.respond(notFoundResponse(
-        ExampleDomainResource.GetExampleDomainRecordsByRecordIdResponse::withPlainNotFound))
-    }
+    asyncResultHandler?.respond(when {
+        records.containsKey(recordId) -> GetByIdResponse.withJsonOK(records[recordId])
+        else -> notFoundResponse(GetByIdResponse::withPlainNotFound)
+    })
   }
 
   override fun deleteExampleDomainRecordsByRecordId(
@@ -91,13 +88,10 @@ class RecordsApi : ExampleDomainResource {
     if(records.containsKey(recordId)) {
       records.remove(recordId)
 
-      asyncResultHandler?.respond(
-        ExampleDomainResource.DeleteExampleDomainRecordsByRecordIdResponse
-          .withNoContent())
+      asyncResultHandler?.respond(DeleteByIdResponse.withNoContent())
     }
     else {
-      asyncResultHandler?.respond(notFoundResponse(
-        ExampleDomainResource.DeleteExampleDomainRecordsByRecordIdResponse::withPlainNotFound))
+      asyncResultHandler?.respond(notFoundResponse(DeleteByIdResponse::withPlainNotFound))
     }
   }
 
@@ -112,13 +106,10 @@ class RecordsApi : ExampleDomainResource {
     //TODO: Validate that ID in representation matches URL parameter
     if(records.containsKey(recordId)) {
       records.replace(recordId!!, entity!!);
-      asyncResultHandler?.respond(
-        ExampleDomainResource.PutExampleDomainRecordsByRecordIdResponse
-          .withNoContent())
+      asyncResultHandler?.respond(PutResponse.withNoContent())
     }
     else {
-      asyncResultHandler?.respond(notFoundResponse(
-          ExampleDomainResource.PutExampleDomainRecordsByRecordIdResponse::withPlainNotFound));
+      asyncResultHandler?.respond(notFoundResponse(PutResponse::withPlainNotFound));
     }
   }
 
