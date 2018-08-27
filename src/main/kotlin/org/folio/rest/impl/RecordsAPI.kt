@@ -25,8 +25,8 @@ class RecordsApi : ExampleDomainResource {
 
     records.clear()
 
-    asyncResultHandler?.handle(succeededFuture(
-      ExampleDomainResource.DeleteExampleDomainRecordsResponse.withNoContent()))
+    asyncResultHandler?.respond(
+      ExampleDomainResource.DeleteExampleDomainRecordsResponse.withNoContent())
   }
 
   override fun getExampleDomainRecords(
@@ -35,11 +35,11 @@ class RecordsApi : ExampleDomainResource {
     asyncResultHandler: Handler<AsyncResult<Response>>?,
     vertxContext: Context?) {
 
-    asyncResultHandler?.handle(succeededFuture(
+    asyncResultHandler?.respond(
       ExampleDomainResource.GetExampleDomainRecordsResponse.withJsonOK(
         Records()
           .withTotalRecords(records.size)
-          .withRecords(ArrayList(records.values)))))
+          .withRecords(ArrayList(records.values))))
   }
 
   override fun postExampleDomainRecords(
@@ -58,9 +58,9 @@ class RecordsApi : ExampleDomainResource {
 
     val location = "example-domain/records/${entity.id}"
 
-    asyncResultHandler?.handle(succeededFuture(
+    asyncResultHandler?.respond(
       ExampleDomainResource.PostExampleDomainRecordsResponse
-        .withJsonCreated(location, stream)))
+        .withJsonCreated(location, stream))
   }
 
   override fun getExampleDomainRecordsByRecordId(
@@ -71,13 +71,13 @@ class RecordsApi : ExampleDomainResource {
     vertxContext: Context?) {
 
     if(records.containsKey(recordId)) {
-      asyncResultHandler?.handle(succeededFuture(
+      asyncResultHandler?.respond(
         ExampleDomainResource.GetExampleDomainRecordsByRecordIdResponse
-          .withJsonOK(records[recordId])));
+          .withJsonOK(records[recordId]))
     }
     else {
-      asyncResultHandler?.handle(succeededFuture(notFoundResponse(
-          ExampleDomainResource.GetExampleDomainRecordsByRecordIdResponse::withPlainNotFound)));
+      asyncResultHandler?.respond(notFoundResponse(
+        ExampleDomainResource.GetExampleDomainRecordsByRecordIdResponse::withPlainNotFound))
     }
   }
 
@@ -89,16 +89,15 @@ class RecordsApi : ExampleDomainResource {
     vertxContext: Context?) {
 
     if(records.containsKey(recordId)) {
-      records.remove(recordId);
+      records.remove(recordId)
 
-      asyncResultHandler?.handle(succeededFuture(
+      asyncResultHandler?.respond(
         ExampleDomainResource.DeleteExampleDomainRecordsByRecordIdResponse
-          .withNoContent()));
+          .withNoContent())
     }
     else {
-      asyncResultHandler?.handle(succeededFuture(
-        notFoundResponse(
-          ExampleDomainResource.DeleteExampleDomainRecordsByRecordIdResponse::withPlainNotFound)));
+      asyncResultHandler?.respond(notFoundResponse(
+        ExampleDomainResource.DeleteExampleDomainRecordsByRecordIdResponse::withPlainNotFound))
     }
   }
 
@@ -113,16 +112,19 @@ class RecordsApi : ExampleDomainResource {
     //TODO: Validate that ID in representation matches URL parameter
     if(records.containsKey(recordId)) {
       records.replace(recordId!!, entity!!);
-      asyncResultHandler?.handle(succeededFuture(
+      asyncResultHandler?.respond(
         ExampleDomainResource.PutExampleDomainRecordsByRecordIdResponse
-          .withNoContent()));
+          .withNoContent())
     }
     else {
-      asyncResultHandler?.handle(succeededFuture(notFoundResponse(
-          ExampleDomainResource.PutExampleDomainRecordsByRecordIdResponse::withPlainNotFound)));
+      asyncResultHandler?.respond(notFoundResponse(
+          ExampleDomainResource.PutExampleDomainRecordsByRecordIdResponse::withPlainNotFound));
     }
   }
 
   private fun notFoundResponse(notFoundResponseFactory: (String) -> Response) =
     notFoundResponseFactory("Not Found")
+
+  private fun Handler<AsyncResult<Response>>.respond(response: Response) =
+    this.handle(succeededFuture(response))
 }
