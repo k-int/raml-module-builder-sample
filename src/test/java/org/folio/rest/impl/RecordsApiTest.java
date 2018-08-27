@@ -20,6 +20,10 @@ import java.util.stream.Collectors;
 
 import static org.folio.support.InterfaceUrls.Records;
 import static org.folio.support.JsonArrayHelper.toList;
+import static org.folio.support.matchers.ValidationErrorMatchers.hasErrorWith;
+import static org.folio.support.matchers.ValidationErrorMatchers.hasMessage;
+import static org.folio.support.matchers.ValidationErrorMatchers.hasParameter;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -102,6 +106,9 @@ public class RecordsApiTest {
     final Response postResponse = client.attemptPostToCreate(new JsonObject());
 
     assertThat(postResponse.getStatusCode(), is(422));
+    assertThat(postResponse.getBodyAsJson(), hasErrorWith(allOf(
+      hasMessage("may not be null"),
+      hasParameter("name", "null"))));
   }
 
   @Test
