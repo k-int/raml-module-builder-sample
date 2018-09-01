@@ -78,7 +78,7 @@ public class RecordsAPI implements ExampleDomainResource {
     Context vertxContext) {
 
     final Response response = records.exists(recordId)
-      ? GetExampleDomainRecordsByRecordIdResponse.withJsonOK(records.get(recordId))
+      ? GetExampleDomainRecordsByRecordIdResponse.withJsonOK(records.getById(recordId))
       : notFoundResponse(GetExampleDomainRecordsByRecordIdResponse::withPlainNotFound);
 
     respondTo(asyncResultHandler).respondWith(response);
