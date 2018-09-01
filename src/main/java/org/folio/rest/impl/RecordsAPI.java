@@ -2,7 +2,6 @@ package org.folio.rest.impl;
 
 import static org.folio.support.http.Responder.respondTo;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
@@ -15,6 +14,7 @@ import org.folio.rest.jaxrs.model.Records;
 import org.folio.rest.jaxrs.resource.ExampleDomainResource;
 import org.folio.rest.tools.utils.OutStream;
 import org.folio.storage.InMemoryStorage;
+import org.folio.storage.MultipleRecords;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
@@ -40,16 +40,18 @@ public class RecordsAPI implements ExampleDomainResource {
 
   @Override
   public void getExampleDomainRecords(
-    String lang, Map<String, String> okapiHeaders,
-    Handler<AsyncResult<Response>>
-      asyncResultHandler,
+    String lang,
+    Map<String, String> okapiHeaders,
+    Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
+
+    final MultipleRecords<Record> all = records.getAll();
 
     respondTo(asyncResultHandler).respondWith(
       GetExampleDomainRecordsResponse.withJsonOK(
         new Records()
-          .withTotalRecords(records.size())
-          .withRecords(new ArrayList<>(records.values()))));
+          .withRecords(all.getRecords())
+          .withTotalRecords(all.getTotalRecords())));
   }
 
   @Override

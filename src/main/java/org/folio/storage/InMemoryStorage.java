@@ -22,6 +22,10 @@ public class InMemoryStorage<T> extends HashMap<String, T> {
     return get(id);
   }
 
+  public MultipleRecords<T> getAll() {
+    return new MultipleRecords<>(this.values(), this.size());
+  }
+
   public void deleteById(String id) {
     remove(id);
   }
