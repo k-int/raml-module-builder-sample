@@ -15,6 +15,7 @@ import org.folio.rest.jaxrs.resource.ExampleDomainResource;
 import org.folio.rest.tools.utils.OutStream;
 import org.folio.storage.InMemoryStorage;
 import org.folio.storage.MultipleRecords;
+import org.folio.support.Result;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
@@ -62,13 +63,14 @@ public class RecordsAPI implements ExampleDomainResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
 
-    defaultId(entity);
+    final Function<Record, Response> toResponse = r -> createdResponse(r,
+      RecordsAPI::recordLocation, PostExampleDomainRecordsResponse::withJsonCreated);
 
-    records.create(entity);
-
-    respondTo(asyncResultHandler).respondWith(
-      createdResponse(entity, RecordsAPI::recordLocation,
-        PostExampleDomainRecordsResponse::withJsonCreated));
+    Result.from(() -> entity)
+      .map(this::defaultId)
+      .apply(records::create)
+      .map(toResponse)
+      .apply(respondTo(asyncResultHandler)::respondWith);
   }
 
   @Override
@@ -150,9 +152,11 @@ public class RecordsAPI implements ExampleDomainResource {
     return String.format("example-domain/records/%s", record.getId());
   }
 
-  private void defaultId(Record record) {
+  private Record defaultId(Record record) {
     if(record.getId() == null) {
       record.setId(UUID.randomUUID().toString());
     }
+
+    return record;
   }
 }
