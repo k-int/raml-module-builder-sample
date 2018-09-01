@@ -1,41 +1,42 @@
 package org.folio.storage;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
-public class InMemoryStorage<T> extends HashMap<String, T> {
+public class InMemoryStorage<T> {
   private final Function<T, String> idGetter;
+  private final Map<String, T> records = new HashMap<>();
 
   public InMemoryStorage(Function<T, String> idGetter) {
     this.idGetter = idGetter;
   }
 
   public void create(T record) {
-    put(idGetter.apply(record), record);
+    records.put(idGetter.apply(record), record);
   }
 
-  @Override
-  public T replace(String id, T record) {
-    return super.replace(id, record);
+  public void replace(String id, T record) {
+    records.replace(id, record);
   }
 
   public boolean exists(String id) {
-    return containsKey(id);
+    return records.containsKey(id);
   }
 
   public T getById(String id) {
-    return get(id);
+    return records.get(id);
   }
 
   public MultipleRecords<T> getAll() {
-    return new MultipleRecords<>(this.values(), this.size());
+    return new MultipleRecords<>(records.values(), records.size());
   }
 
   public void deleteById(String id) {
-    remove(id);
+    records.remove(id);
   }
 
   public void deleteAll() {
-    clear();
+    records.clear();
   }
 }
