@@ -61,7 +61,7 @@ public class RecordsAPI implements ExampleDomainResource {
 
     defaultId(entity);
 
-    records.put(entity.getId(), entity);
+    create(entity, Record::getId);
 
     respondTo(asyncResultHandler).respondWith(
       createdResponse(entity, RecordsAPI::recordLocation,
@@ -151,5 +151,9 @@ public class RecordsAPI implements ExampleDomainResource {
     if(record.getId() == null) {
       record.setId(UUID.randomUUID().toString());
     }
+  }
+
+  private void create(Record record, Function<Record, String> idGetter) {
+    records.put(idGetter.apply(record), record);
   }
 }
