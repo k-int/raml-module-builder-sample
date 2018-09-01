@@ -3,7 +3,6 @@ package org.folio.rest.impl;
 import static org.folio.support.http.Responder.respondTo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
@@ -15,6 +14,7 @@ import org.folio.rest.jaxrs.model.Record;
 import org.folio.rest.jaxrs.model.Records;
 import org.folio.rest.jaxrs.resource.ExampleDomainResource;
 import org.folio.rest.tools.utils.OutStream;
+import org.folio.storage.InMemoryStorage;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
@@ -22,7 +22,7 @@ import io.vertx.core.Handler;
 
 //TODO: Support multiple tenants
 public class RecordsAPI implements ExampleDomainResource {
-  private static final Map<String, Record> records = new HashMap<>();
+  private static final InMemoryStorage<Record> records = new InMemoryStorage<>();
 
   @Override
   public void deleteExampleDomainRecords(
