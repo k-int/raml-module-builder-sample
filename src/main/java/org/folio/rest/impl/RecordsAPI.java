@@ -22,7 +22,8 @@ import io.vertx.core.Handler;
 
 //TODO: Support multiple tenants
 public class RecordsAPI implements ExampleDomainResource {
-  private static final InMemoryStorage<Record> records = new InMemoryStorage<>();
+  private static final InMemoryStorage<Record> records
+    = new InMemoryStorage<>(Record::getId);
 
   @Override
   public void deleteExampleDomainRecords(
@@ -61,7 +62,7 @@ public class RecordsAPI implements ExampleDomainResource {
 
     defaultId(entity);
 
-    records.create(entity, Record::getId);
+    records.create(entity);
 
     respondTo(asyncResultHandler).respondWith(
       createdResponse(entity, RecordsAPI::recordLocation,
