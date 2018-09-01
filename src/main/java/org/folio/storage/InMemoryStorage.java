@@ -13,4 +13,8 @@ public class InMemoryStorage<T> extends HashMap<String, T> {
   public void create(T record) {
     put(idGetter.apply(record), record);
   }
+
+  public boolean exists(String id) {
+    return containsKey(id);
+  }
 }

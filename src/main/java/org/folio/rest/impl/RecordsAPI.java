@@ -77,7 +77,7 @@ public class RecordsAPI implements ExampleDomainResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
 
-    final Response response = records.containsKey(recordId)
+    final Response response = records.exists(recordId)
       ? GetExampleDomainRecordsByRecordIdResponse.withJsonOK(records.get(recordId))
       : notFoundResponse(GetExampleDomainRecordsByRecordIdResponse::withPlainNotFound);
 
@@ -92,7 +92,7 @@ public class RecordsAPI implements ExampleDomainResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
 
-    if(records.containsKey(recordId)) {
+    if(records.exists(recordId)) {
       records.remove(recordId);
 
       respondTo(asyncResultHandler).respondWith(
@@ -115,7 +115,7 @@ public class RecordsAPI implements ExampleDomainResource {
     Context vertxContext) {
 
     //TODO: Validate that ID in representation matches URL parameter
-    if(records.containsKey(recordId)) {
+    if(records.exists(recordId)) {
       records.replace(recordId, entity);
 
       respondTo(asyncResultHandler).respondWith(
