@@ -17,8 +17,16 @@ public class InMemoryStorage<T> extends HashMap<String, T> {
   public boolean exists(String id) {
     return containsKey(id);
   }
-  
+
   public T getById(String id) {
     return get(id);
+  }
+
+  public void deleteById(String id) {
+    remove(id);
+  }
+
+  public void deleteAll() {
+    clear();
   }
 }

@@ -32,7 +32,7 @@ public class RecordsAPI implements ExampleDomainResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
 
-    records.clear();
+    records.deleteAll();
 
     respondTo(asyncResultHandler).respondWith(
       DeleteExampleDomainRecordsResponse.withNoContent());
@@ -93,7 +93,7 @@ public class RecordsAPI implements ExampleDomainResource {
     Context vertxContext) {
 
     if(records.exists(recordId)) {
-      records.remove(recordId);
+      records.deleteById(recordId);
 
       respondTo(asyncResultHandler).respondWith(
         DeleteExampleDomainRecordsByRecordIdResponse.withNoContent());
