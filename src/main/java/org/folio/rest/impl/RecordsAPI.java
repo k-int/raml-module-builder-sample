@@ -127,7 +127,7 @@ public class RecordsAPI implements ExampleDomainResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Response response) {
 
-    new Responder(asyncResultHandler).respondWith(response);
+    Responder.respondTo(asyncResultHandler).respondWith(response);
   }
 
   private Response notFoundResponse(Function<String, Response> notFoundResponseFactory) {
