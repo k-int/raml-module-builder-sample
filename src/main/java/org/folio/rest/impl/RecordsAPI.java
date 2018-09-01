@@ -59,9 +59,7 @@ public class RecordsAPI implements ExampleDomainResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
 
-    if(entity.getId() == null) {
-      entity.setId(UUID.randomUUID().toString());
-    }
+    defaultId(entity);
 
     records.put(entity.getId(), entity);
 
@@ -147,5 +145,11 @@ public class RecordsAPI implements ExampleDomainResource {
 
   private static String recordLocation(Record record) {
     return String.format("example-domain/records/%s", record.getId());
+  }
+
+  private void defaultId(Record record) {
+    if(record.getId() == null) {
+      record.setId(UUID.randomUUID().toString());
+    }
   }
 }
