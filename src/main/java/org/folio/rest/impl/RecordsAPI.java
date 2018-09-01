@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javax.ws.rs.core.Response;
@@ -64,12 +65,9 @@ public class RecordsAPI implements ExampleDomainResource {
 
     records.put(entity.getId(), entity);
 
-    OutStream stream = new OutStream();
-    stream.setData(entity);
-
     respondTo(asyncResultHandler).respondWith(
-      PostExampleDomainRecordsResponse.withJsonCreated(
-        String.format("example-domain/records/%s", entity.getId()), stream));
+      createdResponse(entity, RecordsAPI::recordLocation,
+        PostExampleDomainRecordsResponse::withJsonCreated));
   }
 
   @Override
@@ -130,7 +128,24 @@ public class RecordsAPI implements ExampleDomainResource {
     }
   }
 
-  private Response notFoundResponse(Function<String, Response> notFoundResponseFactory) {
-    return notFoundResponseFactory.apply("Not Found");
+  private static Response notFoundResponse(Function<String, Response> responseFactory) {
+    return responseFactory.apply("Not Found");
+  }
+
+  private static Response createdResponse(
+    Record record,
+    Function<Record, String> locationFactory,
+    BiFunction<String, OutStream, Response> responseFactory) {
+
+    OutStream innerStream = new OutStream();
+    innerStream.setData(record);
+
+    final String location = locationFactory.apply(record);
+
+    return responseFactory.apply(location, innerStream);
+  }
+
+  private static String recordLocation(Record record) {
+    return String.format("example-domain/records/%s", record.getId());
   }
 }
