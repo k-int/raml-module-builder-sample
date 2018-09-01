@@ -8,10 +8,13 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 public class Responder {
-  public void respondWith(
-    Handler<AsyncResult<Response>> asyncResultHandler,
-    Response response) {
+  private final Handler<AsyncResult<Response>> handler;
 
-    asyncResultHandler.handle(succeededFuture(response));
+  public Responder(Handler<AsyncResult<Response>> handler) {
+    this.handler = handler;
+  }
+
+  public void respondWith(Response response) {
+    handler.handle(succeededFuture(response));
   }
 }
