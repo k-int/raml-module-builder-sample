@@ -1,7 +1,5 @@
 package org.folio.rest.impl;
 
-import static io.vertx.core.Future.succeededFuture;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +12,7 @@ import org.folio.rest.jaxrs.model.Record;
 import org.folio.rest.jaxrs.model.Records;
 import org.folio.rest.jaxrs.resource.ExampleDomainResource;
 import org.folio.rest.tools.utils.OutStream;
+import org.folio.support.http.Responder;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
@@ -32,7 +31,7 @@ public class RecordsAPI implements ExampleDomainResource {
 
     records.clear();
 
-    respondWith(asyncResultHandler,
+    new Responder().respondWith(asyncResultHandler,
       DeleteExampleDomainRecordsResponse.withNoContent());
   }
 
@@ -43,7 +42,7 @@ public class RecordsAPI implements ExampleDomainResource {
       asyncResultHandler,
     Context vertxContext) {
 
-    respondWith(asyncResultHandler,
+    new Responder().respondWith(asyncResultHandler,
       GetExampleDomainRecordsResponse.withJsonOK(
         new Records()
           .withTotalRecords(records.size())
@@ -67,7 +66,7 @@ public class RecordsAPI implements ExampleDomainResource {
     OutStream stream = new OutStream();
     stream.setData(entity);
 
-    respondWith(asyncResultHandler,
+    new Responder().respondWith(asyncResultHandler,
       PostExampleDomainRecordsResponse.withJsonCreated(
         String.format("example-domain/records/%s", entity.getId()),
         stream));
@@ -82,12 +81,12 @@ public class RecordsAPI implements ExampleDomainResource {
     Context vertxContext) {
 
     if(records.containsKey(recordId)) {
-      respondWith(asyncResultHandler,
+      new Responder().respondWith(asyncResultHandler,
         GetExampleDomainRecordsByRecordIdResponse.withJsonOK(
           records.get(recordId)));
     }
     else {
-      respondWith(asyncResultHandler,
+      new Responder().respondWith(asyncResultHandler,
         notFoundResponse(GetExampleDomainRecordsByRecordIdResponse::withPlainNotFound));
     }
   }
@@ -103,11 +102,11 @@ public class RecordsAPI implements ExampleDomainResource {
     if(records.containsKey(recordId)) {
       records.remove(recordId);
 
-      respondWith(asyncResultHandler,
+      new Responder().respondWith(asyncResultHandler,
         DeleteExampleDomainRecordsByRecordIdResponse.withNoContent());
     }
     else {
-      respondWith(asyncResultHandler,
+      new Responder().respondWith(asyncResultHandler,
         notFoundResponse(DeleteExampleDomainRecordsByRecordIdResponse::withPlainNotFound));
     }
   }
@@ -124,23 +123,16 @@ public class RecordsAPI implements ExampleDomainResource {
     //TODO: Validate that ID in representation matches URL parameter
     if(records.containsKey(recordId)) {
       records.replace(recordId, entity);
-      respondWith(asyncResultHandler,
+      new Responder().respondWith(asyncResultHandler,
         PutExampleDomainRecordsByRecordIdResponse.withNoContent());
     }
     else {
-      respondWith(asyncResultHandler,
+      new Responder().respondWith(asyncResultHandler,
         notFoundResponse(PutExampleDomainRecordsByRecordIdResponse::withPlainNotFound));
     }
   }
 
   private Response notFoundResponse(Function<String, Response> notFoundResponseFactory) {
     return notFoundResponseFactory.apply("Not Found");
-  }
-
-  private void respondWith(
-    Handler<AsyncResult<Response>> asyncResultHandler,
-    Response response) {
-
-    asyncResultHandler.handle(succeededFuture(response));
   }
 }
