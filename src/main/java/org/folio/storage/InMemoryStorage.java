@@ -14,6 +14,11 @@ public class InMemoryStorage<T> extends HashMap<String, T> {
     put(idGetter.apply(record), record);
   }
 
+  @Override
+  public T replace(String id, T record) {
+    return super.replace(id, record);
+  }
+
   public boolean exists(String id) {
     return containsKey(id);
   }
