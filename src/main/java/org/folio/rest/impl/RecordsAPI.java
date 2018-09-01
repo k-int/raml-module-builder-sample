@@ -80,15 +80,11 @@ public class RecordsAPI implements ExampleDomainResource {
     Handler<AsyncResult<Response>> asyncResultHandler,
     Context vertxContext) {
 
-    if(records.containsKey(recordId)) {
-      respondTo(asyncResultHandler).respondWith(
-        GetExampleDomainRecordsByRecordIdResponse.withJsonOK(
-          records.get(recordId)));
-    }
-    else {
-      respondTo(asyncResultHandler).respondWith(
-        notFoundResponse(GetExampleDomainRecordsByRecordIdResponse::withPlainNotFound));
-    }
+    final Response response = records.containsKey(recordId)
+      ? GetExampleDomainRecordsByRecordIdResponse.withJsonOK(records.get(recordId))
+      : notFoundResponse(GetExampleDomainRecordsByRecordIdResponse::withPlainNotFound);
+
+    respondTo(asyncResultHandler).respondWith(response);
   }
 
   @Override
